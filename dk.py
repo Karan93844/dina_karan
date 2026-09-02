@@ -16,6 +16,22 @@ if st.button("Generate ✨"):
     c1.image(f"https://dicebear.com{wisher}", caption=wisher)
     c2.image(f"https://dicebear.com{receiver}", caption=f"{receiver} 🎉")
     
+      client = InferenceClient(model="HuggingFaceH4/zephyr-7b-beta", token=st.secrets.get("HF_TOKEN"))
+    col_text, col_img = st.columns(2)
+    
+    with col_text, st.spinner("Writing..."):
+        prompt_t = f"Short heartfelt birthday wish from {wisher} to {receiver}. Detail: {needs}. No placeholders."
+        
+        # Use simpler text generation layout to avoid strict chat template validation
+        try:
+            res = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt_t}], 
+                max_tokens=150
+            )
+            st.info(res.choices[0].message.content)
+        except Exception as text_err:
+            st.error(f"Text generation issue: {text_err}")
+    
     # Text Generation Client
     client = InferenceClient(model="meta-llama/Meta-Llama-3-8B-Instruct", token=st.secrets.get("HF_TOKEN"))
     col_text, col_img = st.columns(2)
